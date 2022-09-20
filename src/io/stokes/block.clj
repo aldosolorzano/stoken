@@ -130,6 +130,10 @@
   (:children node))
 
 (defn block->height [block]
+  "The number of blocks preceding a particular block on a block chain.
+   For example, the genesis block has a height of zero because zero block preceded it.
+
+   The current block’s height is found the first transaction of the block (coinbase)"
   (let [transactions (:transactions block)
         [coinbase] (filter transaction/coinbase? transactions)
         {:keys [block-height]} (-> coinbase
@@ -215,7 +219,7 @@
 (defn- min-keys [f xs]
   (select-many-by-key min f xs))
 
-(defn- select-nodes-with-most-work [nodes]
+(defn select-nodes-with-most-work [nodes]
   (max-keys total-difficulty nodes))
 
 (defn- node->timestamp [node]
@@ -225,7 +229,7 @@
 (defn- select-earliest-nodes [nodes]
   (min-keys node->timestamp nodes))
 
-(defn- fork-choice-rule
+(defn fork-choice-rule
   "We use a fork choice rule resembling Bitcoin Core. First find the nodes with the most work, breaking ties by timestamp"
   [nodes]
   (-> nodes
@@ -326,7 +330,7 @@
 
 (defn valid? [blockchain max-threshold ledger block halving-frequency base-block-reward]
   (and
-   (not (empty? (:transactions block)))
+   (seq (:transactions block))
    (valid-proof-of-work? block max-threshold)
    (reasonable-time? (best-chain blockchain) block)
    (proper-transactions? ledger block halving-frequency base-block-reward)

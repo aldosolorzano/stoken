@@ -3,7 +3,7 @@
   :url "github.com/ralexstokes/stoken"
   :license {:name "MIT License"
             :url "https://opensource.org/licenses/MIT"}
-  :dependencies [[org.clojure/clojure "1.8.0"]
+  :dependencies [[org.clojure/clojure "1.11.0"]
                  [org.clojure/core.async "0.3.465"]
                  [crypto-random "1.2.0"]
                  [digest "1.4.6"]
@@ -11,6 +11,7 @@
                  [http-kit "2.2.0"]
                  [compojure "1.6.0"]
                  [org.clojure/data.json "0.2.6"]
+                 [javax.xml.bind/jaxb-api "2.3.0"]
                  [com.github.Sepia-Officinalis/secp256k1 "fd44e1e0d6"]
                  [rm-hull/base58 "0.1.0"]
                  [aleph "0.4.4"]

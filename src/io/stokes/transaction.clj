@@ -57,7 +57,10 @@
               :block-height block-height}]
     :outputs [(new-output value address)]}))
 
-(defn coinbase? [transaction]
+(defn coinbase?
+  "A special field used as the sole input for coinbase transactions. The coinbase allows claiming the block reward"
+  [transaction]
+
   (->> transaction
        :inputs
        first

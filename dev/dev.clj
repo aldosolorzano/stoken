@@ -9,6 +9,7 @@
 
   See also https://github.com/stuartsierra/component.repl"
   (:require
+   [clojure.edn :as edn]
    [clojure.java.io :as io]
    [clojure.java.javadoc :refer [javadoc]]
    [clojure.pprint :refer [pprint]]
@@ -17,22 +18,21 @@
    [clojure.set :as set]
    [clojure.string :as string]
    [clojure.test :as test]
-   [clojure.edn :as edn]
-   [clojure.tools.namespace.repl :refer [refresh refresh-all clear]]
+   [clojure.tools.namespace.repl :refer [clear refresh refresh-all]]
    [com.stuartsierra.component :as component]
    [com.stuartsierra.component.repl :refer [reset set-init start stop system]]
    [crypto.random :as rand]
-   [io.stokes.node :as node]
-   [io.stokes.rpc :as rpc]
-   [io.stokes.p2p :as p2p]
    [io.stokes.block :as block]
-   [io.stokes.transaction :as transaction]
-   [io.stokes.miner :as miner]
-   [io.stokes.state :as state]
-   [io.stokes.queue :as queue]
    [io.stokes.hash :as hash]
    [io.stokes.key :as key]
    [io.stokes.key-store :as key-store]
+   [io.stokes.miner :as miner]
+   [io.stokes.node :as node]
+   [io.stokes.p2p :as p2p]
+   [io.stokes.queue :as queue]
+   [io.stokes.rpc :as rpc]
+   [io.stokes.state :as state]
+   [io.stokes.transaction :as transaction]
    [io.stokes.transaction-pool :as transaction-pool]
    [me.raynes.fs :as fs]))
 
@@ -282,6 +282,7 @@
 
 (defn- chain-walks-consistent? [system]
   (let [hash-links (inspect-chains system [:previous-hash :hash])]
+    (pp hash-links)
     (->> hash-links
          (map #(partition-all 2 %))
          (map #(reduce valid-chain-walk? %))
@@ -386,7 +387,6 @@
    (let [transaction (transaction-for ledger from-keys to-keys value previous-out-points)]
      (queue/submit-transaction queue transaction))))
 
-
 (defn ledger-reconciles-chain [node]
   (let [balance (->balance node)
         total-coins-on-ledger (reduce + (vals balance))
@@ -412,6 +412,9 @@
 ;; launch a network of `peer-count` peers
 
 (set-init (fn [_] (network-of {:peer-count peer-count})))
+
+(defn ensure-system-started! []
+  (start))
 
 (comment ;; some utilities
   (apply-chains #(map :hash %) system)
@@ -441,8 +444,8 @@
                         first
                         (select-keys [:hash :index]))] ;; have to treat coinbase output in special way
         transaction (transaction-for ledger from-keys to-keys value out-points)]
-    (#'transaction/apply-transaction-to-ledger ledger transaction))
-  )
+    (#'transaction/apply-transaction-to-ledger ledger transaction)))
+  
 
 (comment
   ;; transaction
@@ -512,6 +515,6 @@
 
   ;; control
   (stop)
-  (reset)
-  )
+  (reset))
+  
 
